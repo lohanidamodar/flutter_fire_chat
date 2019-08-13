@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_fire_chat/res/db_provider.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
@@ -24,6 +25,7 @@ class UserRepository with ChangeNotifier {
       _status = Status.Authenticating;
       notifyListeners();
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+      DatabaseService().createUser(await _auth.currentUser());
       return true;
     } catch (e) {
       _status = Status.Unauthenticated;
@@ -44,6 +46,7 @@ class UserRepository with ChangeNotifier {
         idToken: googleAuth.idToken,
       );
       await _auth.signInWithCredential(credential);
+      DatabaseService().createUser(await _auth.currentUser());
       return true;
     } catch (e) {
       print(e);
